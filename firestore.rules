@@ -1,0 +1,97 @@
+﻿
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function perfil() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/usuarios/$(request.auth.uid));
+    }
+    function admin() {
+      return perfil() &&
+        get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.rol == "admin" &&
+        get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.estado == "activo";
+    }
+    function empleado() {
+      return perfil() &&
+        get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.rol == "empleado" &&
+        get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.estado == "activo";
+    }
+    function asignado(id) {
+      return empleado() &&
+        exists(/databases/$(database)/documents/prestamos/$(id)) &&
+        get(/databases/$(database)/documents/prestamos/$(id)).data.empleadoId == request.auth.uid;
+    }
+    match /usuarios/{id} {
+      allow get: if admin() || (request.auth != null && request.auth.uid == id);
+      allow list: if admin();
+      allow create: if request.auth != null && request.auth.uid == id &&
+        request.resource.data.rol == "pendiente" &&
+        request.resource.data.estado == "pendiente";
+      allow update: if admin();
+      allow delete: if false;
+    }
+    match /clientes/{id} {
+      allow read: if admin() || (empleado() && resource.data.empleadoId == request.auth.uid);
+      allow create, update: if admin();
+      allow delete: if false;
+    }
+    match /prestamos/{id} {
+      allow read: if admin() || (empleado() && resource.data.empleadoId == request.auth.uid);
+      allow create, update: if admin();
+      allow delete: if false;
+    }
+    match /recibosPrestamo/{id} {
+      allow read: if admin() || asignado(id);
+      allow create: if admin();
+      allow update, delete: if false;
+    }
+    match /prestamoEventos/{id} {
+      allow read, create: if admin();
+      allow update, delete: if false;
+    }
+    match /prestamoControl/{id} {
+      allow read: if admin() || asignado(id);
+      allow create, update: if admin();
+      allow delete: if false;
+    }
+    match /saldosPrestamo/{id} {
+      allow get: if admin() || asignado(id);
+      allow list: if admin();
+      allow create, update: if admin() || (
+        asignado(id) &&
+        request.resource.data.prestamoId == id &&
+        request.resource.data.abonadoCentavos is int &&
+        request.resource.data.abonadoCentavos > 0 &&
+        request.resource.data.abonadoCentavos <=
+          get(/databases/$(database)/documents/prestamos/$(id)).data.totalPactadoCentavos &&
+        request.resource.data.totalCentavos ==
+          get(/databases/$(database)/documents/prestamos/$(id)).data.totalPactadoCentavos &&
+        (!exists(/databases/$(database)/documents/saldosPrestamo/$(id)) ||
+          request.resource.data.abonadoCentavos > resource.data.abonadoCentavos)
+      );
+      allow delete: if false;
+    }
+    match /pagos/{id} {
+      allow read: if admin() || (empleado() && resource.data.creadoPor == request.auth.uid);
+      allow create: if admin() || (
+        asignado(request.resource.data.prestamoId) &&
+        request.resource.data.creadoPor == request.auth.uid &&
+        request.resource.data.montoCentavos is int &&
+        request.resource.data.montoCentavos > 0
+      );
+      allow update, delete: if false;
+    }
+    match /recibosAbono/{id} {
+      allow read: if admin() || (empleado() && resource.data.creadoPor == request.auth.uid);
+      allow create: if admin() || (
+        asignado(request.resource.data.prestamoId) &&
+        request.resource.data.creadoPor == request.auth.uid &&
+        request.resource.data.tipo == "abono"
+      );
+      allow update, delete: if false;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

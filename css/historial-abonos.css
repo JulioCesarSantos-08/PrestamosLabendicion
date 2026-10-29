@@ -1,0 +1,193 @@
+
+.historial-abonos-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 6500;
+  background: #061426ba;
+  display: grid;
+  place-items: center;
+  padding: 14px;
+}
+
+.historial-abonos-overlay[hidden] {
+  display: none !important;
+}
+
+.historial-abonos-dialog {
+  width: min(100%, 520px);
+  max-height: 92dvh;
+  background: white;
+  color: #061d3d;
+  border-radius: 16px;
+  overflow-y: auto;
+  box-shadow: 0 20px 70px #0004;
+}
+
+.historial-abonos-header {
+  padding: 22px;
+  background: #061d3d;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.historial-abonos-header small {
+  font-size: 10px;
+  color: #d6b56e;
+  letter-spacing: 1px;
+  font-weight: 800;
+}
+
+.historial-abonos-header h2 {
+  margin: 7px 0 0;
+  font-size: 21px;
+}
+
+.historial-abonos-header button {
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 9px;
+  background: #ffffff20;
+  color: white;
+  font-size: 23px;
+  cursor: pointer;
+}
+
+.historial-abonos-body {
+  padding: 20px;
+}
+
+.historial-abonos-fila {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e8edf3;
+  font-size: 12px;
+}
+
+.historial-abonos-fila span {
+  color: #73839a;
+}
+
+.historial-abonos-fila strong {
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.historial-abonos-resumen {
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+  margin: 18px 0;
+  border-radius: 12px;
+  background: #061d3d;
+  color: white;
+}
+
+.historial-abonos-resumen span {
+  font-size: 11px;
+  color: #cbd6e5;
+}
+
+.historial-abonos-resumen strong {
+  color: #e8c77d;
+  font-size: 27px;
+}
+
+.historial-abonos-resumen small {
+  color: #e2e9f2;
+}
+
+.historial-abonos-tarjeta {
+  border: 1px solid #e3eaf2;
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 13px;
+}
+
+.historial-abonos-tarjeta-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 9px;
+}
+
+.historial-abonos-tarjeta-header strong {
+  color: #061d3d;
+  font-size: 20px;
+}
+
+.historial-abonos-tarjeta-header span {
+  color: #a77c32;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.historial-abonos-boton,
+.historial-abonos-acciones button {
+  cursor: pointer;
+}
+
+.historial-abonos-tarjeta > button {
+  border: 0;
+  background: #c9a35a;
+  color: #061d3d;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 11px 16px;
+  border-radius: 8px;
+  margin-top: 13px;
+}
+
+.historial-abonos-acciones {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.historial-abonos-acciones button {
+  border: 1px solid #dbe3ec;
+  background: #061d3d;
+  color: white;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.historial-abonos-footer {
+  padding: 15px 20px;
+  border-top: 1px solid #e7ecf3;
+  text-align: right;
+}
+
+.historial-abonos-footer button {
+  border: 0;
+  border-radius: 8px;
+  background: #061d3d;
+  color: white;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+@media (max-width: 540px) {
+  .historial-abonos-overlay {
+    padding: 7px;
+  }
+
+  .historial-abonos-header,
+  .historial-abonos-body {
+    padding: 16px;
+  }
+
+  .historial-abonos-fila {
+    font-size: 11px;
+  }
+}

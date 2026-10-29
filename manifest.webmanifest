@@ -1,0 +1,33 @@
+﻿{
+  "id": "./",
+  "name": "Préstamos La Bendición",
+  "short_name": "La Bendición",
+  "description": "Sistema privado de préstamos y cobranza.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#061D3D",
+  "theme_color": "#061D3D",
+  "orientation": "any",
+  "lang": "es-MX",
+  "icons": [
+    {
+      "src": "./assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -1,0 +1,445 @@
+﻿:root {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #14243b;
+  background: #f6f7fa;
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+
+body { margin: 0; min-height: 100vh; }
+
+button, input { font: inherit; }
+
+button { cursor: pointer; }
+
+.auth-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.brand-panel {
+  position: relative;
+  background: radial-gradient(circle at 30% 20%, #143c6a, #061d3d 65%, #03132b);
+  color: #fff;
+  padding: clamp(32px, 6vw, 100px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  overflow: hidden;
+}
+
+.brand-panel::after {
+  content: "";
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border: 1px solid #c9a35a50;
+  border-radius: 50%;
+  right: -220px;
+  bottom: -180px;
+}
+
+.brand-symbol {
+  color: #e2c27e;
+  font-size: 75px;
+  line-height: 1;
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  color: #d9bd82;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+.brand-panel h1 {
+  font-family: Georgia, serif;
+  font-size: clamp(35px, 4.5vw, 67px);
+  line-height: 1.13;
+  letter-spacing: 1px;
+  margin: 20px 0;
+}
+
+.brand-panel h1 span { color: #e2c27e; }
+
+.brand-panel > p:not(.eyebrow) {
+  color: #d1dbe7;
+  font-size: 17px;
+  max-width: 410px;
+  line-height: 1.7;
+}
+
+.brand-footer {
+  position: absolute;
+  bottom: 35px;
+  color: #c9a35a;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.auth-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+}
+
+.auth-card { width: 100%; max-width: 420px; }
+
+.mobile-brand { display: none; }
+
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid #e0e4eb;
+  margin-bottom: 35px;
+}
+
+.tab {
+  border: 0;
+  background: transparent;
+  color: #758093;
+  font-weight: 600;
+  padding: 17px 8px;
+  border-bottom: 3px solid transparent;
+}
+
+.tab.active {
+  color: #061d3d;
+  border-bottom-color: #c9a35a;
+}
+
+.heading h2, #statusView h2 {
+  margin: 0 0 9px;
+  font-size: 29px;
+  letter-spacing: -1px;
+}
+
+.heading p, #statusView p {
+  color: #778294;
+  line-height: 1.6;
+  margin: 0 0 30px;
+}
+
+.field { margin-bottom: 20px; }
+
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 9px;
+}
+
+.field input {
+  width: 100%;
+  height: 51px;
+  border: 1px solid #dce1e8;
+  border-radius: 10px;
+  background: white;
+  padding: 0 15px;
+  outline: none;
+  transition: .2s;
+}
+
+.field input:focus {
+  border-color: #c9a35a;
+  box-shadow: 0 0 0 3px #c9a35a25;
+}
+
+.label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.text-button {
+  background: none;
+  border: 0;
+  color: #9a7738;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.primary-button, .secondary-button {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 10px;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.primary-button {
+  border: 0;
+  background: #061d3d;
+  color: white;
+}
+
+.primary-button:hover { background: #103765; }
+
+.primary-button:disabled { opacity: .6; cursor: wait; }
+
+.secondary-button {
+  background: transparent;
+  color: #061d3d;
+  border: 1px solid #dce1e8;
+}
+
+.message {
+  border-radius: 10px;
+  padding: 13px;
+  font-size: 13px;
+  line-height: 1.6;
+  margin-top: 20px;
+}
+
+.message.error { color: #9c2929; background: #fff0f0; }
+.message.success { color: #226744; background: #e9f7ef; }
+
+.hidden { display: none !important; }
+
+#statusView { text-align: center; }
+
+.status-icon { font-size: 52px; margin-bottom: 20px; }
+
+.auth-footer {
+  margin-top: 45px;
+  text-align: center;
+  color: #9ca5b1;
+  font-size: 12px;
+}
+
+@media (max-width: 850px) {
+  .auth-layout { grid-template-columns: 1fr; }
+  .brand-panel { display: none; }
+  .auth-panel { min-height: 100vh; padding: 35px 22px; }
+  .mobile-brand {
+    display: block;
+    text-align: center;
+    color: #9b793d;
+    font-family: Georgia, serif;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 35px;
+  }
+}
+
+@media (max-width: 400px) {
+  .heading h2 { font-size: 26px; }
+  .auth-panel { padding: 25px 17px; }
+}
+
+.brand-symbol {
+  width: 115px;
+  height: 115px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+  overflow: hidden;
+  border-radius: 24px;
+  background: #ffffff08;
+  border: 1px solid #c9a35a45;
+}
+
+.brand-symbol img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.mobile-brand {
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.mobile-brand img {
+  width: 43px;
+  height: 43px;
+  object-fit: contain;
+  border-radius: 9px;
+}
+
+@media (max-width: 850px) {
+  .mobile-brand {
+    display: flex;
+  }
+}
+
+.intro-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 38%, #10335b 0%, #061d3d 58%, #020d1e 100%);
+  color: #e3bf73;
+  transition: opacity .6s ease, visibility .6s ease;
+}
+
+.intro-screen.intro-finished {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.intro-glow {
+  position: absolute;
+  width: 330px;
+  height: 330px;
+  border-radius: 50%;
+  background: #c9a35a12;
+  filter: blur(75px);
+  animation: introGlow 2.2s ease-in-out infinite alternate;
+}
+
+.intro-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: min(90%, 440px);
+  animation: introAppear .8s ease both;
+}
+
+.intro-logo-wrap {
+  width: 145px;
+  height: 145px;
+  padding: 10px;
+  border: 1px solid #c9a35a65;
+  border-radius: 30px;
+  background: #ffffff08;
+  box-shadow: 0 0 65px #c9a35a12;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: introFloat 2.2s ease-in-out infinite alternate;
+}
+
+.intro-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 20px;
+}
+
+.intro-divider {
+  width: 55px;
+  height: 1px;
+  background: #c9a35a;
+  margin: 27px 0 22px;
+  animation: introLine 1.4s ease both;
+}
+
+.intro-name,
+.intro-subname {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 700;
+  text-shadow: 0 3px 15px #00000045;
+}
+
+.intro-name {
+  font-size: clamp(29px, 6vw, 44px);
+  letter-spacing: 3px;
+}
+
+.intro-subname {
+  font-size: clamp(23px, 5vw, 35px);
+  letter-spacing: 2px;
+  margin-top: 4px;
+}
+
+.intro-slogan {
+  color: #d6c5a1;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  margin-top: 20px;
+}
+
+.intro-progress {
+  width: 185px;
+  height: 3px;
+  background: #ffffff1c;
+  border-radius: 20px;
+  margin-top: 35px;
+  overflow: hidden;
+}
+
+.intro-progress-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #8c6930, #f5d997, #c9a35a);
+  transform-origin: left;
+  animation: introLoad 1.9s ease-in-out both;
+}
+
+.intro-loading {
+  font-size: 9px;
+  color: #b9c4d3;
+  letter-spacing: 2px;
+  margin-top: 16px;
+}
+
+.intro-bottom {
+  position: absolute;
+  bottom: 30px;
+  color: #bca477;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-align: center;
+  padding: 0 15px;
+}
+
+@keyframes introAppear {
+  from { opacity: 0; transform: translateY(25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes introFloat {
+  from { transform: translateY(0); }
+  to { transform: translateY(-7px); }
+}
+
+@keyframes introGlow {
+  from { opacity: .4; transform: scale(.8); }
+  to { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes introLine {
+  from { width: 0; opacity: 0; }
+  to { width: 55px; opacity: 1; }
+}
+
+@keyframes introLoad {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@media (max-width: 480px) {
+  .intro-logo-wrap {
+    width: 120px;
+    height: 120px;
+    border-radius: 25px;
+  }
+
+  .intro-name { letter-spacing: 2px; }
+  .intro-subname { letter-spacing: 1px; }
+  .intro-slogan { font-size: 9px; letter-spacing: 1px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-screen *,
+  .intro-screen *::before,
+  .intro-screen *::after {
+    animation: none !important;
+  }
+}

@@ -1,0 +1,16 @@
+﻿node_modules/
+.env
+.env.*
+!.env.example
+*.bak
+*.backup
+*.temporal.js
+*.log
+*.zip
+*.key
+*.pem
+serviceAccountKey.json
+firebase-adminsdk*.json
+pruebas-seguridad/
+firestore.rules.propuesta
+.firebase/

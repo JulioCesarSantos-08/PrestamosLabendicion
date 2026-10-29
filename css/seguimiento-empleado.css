@@ -1,0 +1,164 @@
+
+.seg-panel {
+  margin-top: 28px;
+  padding: 20px;
+  border: 1px solid #e1e8f1;
+  border-radius: 14px;
+  background: #fff;
+  color: #061d3d;
+}
+
+.seg-titulo {
+  margin-bottom: 17px;
+}
+
+.seg-subtitulo {
+  color: #aa7d35;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.seg-titulo h2 {
+  margin: 8px 0;
+  font-family: Georgia, serif;
+  font-size: 23px;
+}
+
+.seg-titulo p {
+  color: #7889a0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.seg-resumen {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.seg-indicador {
+  display: grid;
+  gap: 9px;
+  background: #f2f5fa;
+  border: 1px solid #e7ecf4;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.seg-indicador span {
+  font-size: 11px;
+  color: #6d7e94;
+}
+
+.seg-indicador strong {
+  font-size: 19px;
+  overflow-wrap: anywhere;
+}
+
+.seg-lista {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.seg-cliente {
+  padding: 16px;
+  border: 1px solid #e5ebf2;
+  border-radius: 11px;
+}
+
+.seg-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.seg-encabezado strong {
+  font-size: 13px;
+}
+
+.seg-etiqueta {
+  background: #fff1d9;
+  color: #925b12;
+  padding: 7px 9px;
+  border-radius: 20px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .7px;
+}
+
+.seg-cliente > p {
+  color: #72839a;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.seg-cifras {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 14px 0;
+}
+
+.seg-cifras > div {
+  display: grid;
+  gap: 7px;
+  background: #f5f7fa;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.seg-cifras span {
+  color: #76869a;
+  font-size: 10px;
+}
+
+.seg-cifras strong {
+  color: #061d3d;
+  font-size: 17px;
+}
+
+.seg-cifras strong.seg-alerta {
+  color: #ae492f;
+}
+
+.seg-vacio {
+  border: 1px dashed #d5dfeb;
+  border-radius: 10px;
+  padding: 22px;
+  text-align: center;
+  color: #77869a;
+  font-size: 12px;
+}
+
+.seg-nota {
+  margin: 16px 0 0;
+  color: #8a754f;
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+@media (max-width: 750px) {
+  .seg-resumen {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .seg-panel {
+    padding: 14px;
+  }
+
+  .seg-titulo h2 {
+    font-size: 20px;
+  }
+
+  .seg-indicador {
+    padding: 12px;
+  }
+
+  .seg-indicador strong {
+    font-size: 17px;
+  }
+}

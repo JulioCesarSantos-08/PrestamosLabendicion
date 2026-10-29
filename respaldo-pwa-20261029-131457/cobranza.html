@@ -1,0 +1,218 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#061D3D">
+<title>Cobranza | Préstamos La Bendición</title>
+<link rel="stylesheet" href="css/prestamos.css">
+<link rel="stylesheet" href="css/cobranza.css">
+</head>
+<body>
+<div id="loading" class="loading">
+  <img src="imagenes/logo.png" alt="Préstamos La Bendición">
+  <p>VERIFICANDO ACCESO SEGURO</p>
+</div>
+
+<div id="app" class="layout" hidden>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <img src="imagenes/logo.png" alt="Logo">
+      <div>
+        <strong>PRÉSTAMOS</strong>
+        <span>LA BENDICIÓN</span>
+      </div>
+    </div>
+    <p class="nav-label">ADMINISTRACIÓN</p>
+    <nav class="nav">
+      <a href="admin.html">⌂ <span>Resumen general</span></a>
+      <a href="admin.html?seccion=usuarios">♙ <span>Empleados</span></a>
+      <a href="clientes.html">♧ <span>Clientes</span></a>
+      <a href="prestamos.html">▤ <span>Préstamos</span></a>
+      <a href="cobranza.html" class="active">▣ <span>Cobranza</span></a>
+      <a href="admin.html?seccion=reportes">▥ <span>Reportes</span></a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="profile">
+        <div class="avatar">A</div>
+        <div>
+          <strong id="adminName">ADMINISTRADOR</strong>
+          <small>Administrador general</small>
+        </div>
+      </div>
+      <button id="logout" class="logout">Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <div id="overlay" class="overlay"></div>
+
+  <div class="workspace">
+    <header class="topbar">
+      <div class="top-left">
+        <button id="menuButton" class="menu-button" type="button" aria-label="Abrir menú">☰</button>
+        <div>
+          <span class="breadcrumb">ADMINISTRACIÓN / COBRANZA</span>
+          <h1>Control de cobranza</h1>
+        </div>
+      </div>
+      <div class="top-avatar">A</div>
+    </header>
+
+    <main class="content">
+      <section class="heading">
+        <div>
+          <span class="eyebrow">MOVIMIENTOS FINANCIEROS</span>
+          <h2>Cobros y abonos</h2>
+          <p>Registra pagos y entrega comprobantes a tus clientes.</p>
+        </div>
+        <button id="newPayment" class="primary-button" type="button">＋ Registrar abono</button>
+      </section>
+
+      <section class="stats">
+        <article class="stat-card">
+          <span>Abonos registrados</span>
+          <strong id="collectedTotal">$0.00</strong>
+          <small>Total recibido de los clientes</small>
+        </article>
+        <article class="stat-card">
+          <span>Pendiente pactado</span>
+          <strong id="pendingTotal">$0.00</strong>
+          <small>De préstamos con total definido</small>
+        </article>
+        <article class="stat-card">
+          <span>Movimientos</span>
+          <strong id="paymentsCount">0</strong>
+          <small>Abonos registrados</small>
+        </article>
+        <article class="stat-card">
+          <span>Préstamos liquidados</span>
+          <strong id="paidLoans">0</strong>
+          <small>Según el total pactado</small>
+        </article>
+      </section>
+
+      <div class="notice">
+        <strong>Separación de intereses y comisiones pendiente</strong>
+        <p>Los abonos se descuentan del total pactado por devolver. Todavía no se distribuyen automáticamente entre capital, intereses o comisiones hasta que el negocio confirme su método.</p>
+      </div>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h3>Cartera de cobranza</h3>
+            <p>Selecciona un préstamo para consultar su saldo o registrar un abono.</p>
+          </div>
+          <div class="filters">
+            <input id="searchLoans" type="search" placeholder="Buscar cliente o folio">
+            <select id="filterLoans">
+              <option value="todos">Todos</option>
+              <option value="pendientes">Con saldo</option>
+              <option value="liquidados">Liquidados</option>
+              <option value="sinConfigurar">Sin calendario</option>
+            </select>
+          </div>
+        </div>
+        <div id="loansList"></div>
+      </section>
+
+      <section class="panel payments-panel">
+        <div class="panel-header">
+          <div>
+            <h3>Historial de abonos</h3>
+            <p>Comprobantes disponibles para consulta y entrega.</p>
+          </div>
+        </div>
+        <div id="paymentsList"></div>
+      </section>
+    </main>
+
+    <footer>© 2026 PRÉSTAMOS LA BENDICIÓN</footer>
+  </div>
+</div>
+
+<div id="paymentModal" class="modal-backdrop" hidden>
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="paymentTitle">
+    <header class="modal-header">
+      <div>
+        <span class="eyebrow">REGISTRO DE COBRANZA</span>
+        <h2 id="paymentTitle">Registrar abono</h2>
+      </div>
+      <button id="closePayment" class="close-button" type="button" aria-label="Cerrar">×</button>
+    </header>
+
+    <form id="paymentForm">
+      <div class="modal-body">
+        <div class="field">
+          <label for="paymentLoan">Préstamo *</label>
+          <select id="paymentLoan" required>
+            <option value="">Selecciona un préstamo</option>
+          </select>
+        </div>
+
+        <div id="paymentSummary" class="payment-summary">
+          Selecciona un préstamo para consultar el saldo.
+        </div>
+
+        <div class="form-grid payment-fields">
+          <div class="field">
+            <label for="paymentAmount">Cantidad recibida (MXN) *</label>
+            <input id="paymentAmount" type="number" min="0.01" step="0.01" required placeholder="400.00">
+          </div>
+          <div class="field">
+            <label for="paymentDate">Fecha del pago *</label>
+            <input id="paymentDate" type="date" required>
+          </div>
+          <div class="field full">
+            <label for="paymentMethod">Medio de pago *</label>
+            <select id="paymentMethod" required>
+              <option value="efectivo">Efectivo</option>
+              <option value="transferencia">Transferencia</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label for="paymentNote">Observaciones</label>
+            <textarea id="paymentNote" rows="2" maxlength="300" placeholder="Referencia o detalles del pago"></textarea>
+          </div>
+        </div>
+
+        <label class="payment-confirm">
+          <input id="confirmPayment" type="checkbox" required>
+          <span>Confirmo que recibí el importe indicado y que corresponde al préstamo seleccionado.</span>
+        </label>
+
+        <p id="paymentError" class="form-error" role="alert"></p>
+      </div>
+
+      <div class="modal-footer">
+        <button id="cancelPayment" class="secondary-button" type="button">Cancelar</button>
+        <button id="savePayment" class="primary-button" type="submit">Guardar y generar recibo</button>
+      </div>
+    </form>
+  </section>
+</div>
+
+<div id="receiptModal" class="modal-backdrop" hidden>
+  <section class="modal payment-receipt-modal" role="dialog" aria-modal="true" aria-labelledby="receiptTitle">
+    <header class="modal-header">
+      <div>
+        <span class="eyebrow">COMPROBANTE DIGITAL</span>
+        <h2 id="receiptTitle">Recibo de abono</h2>
+      </div>
+      <button id="closeReceipt" class="close-button" type="button" aria-label="Cerrar">×</button>
+    </header>
+    <div id="receiptContent"></div>
+    <div class="receipt-buttons">
+      <button id="downloadReceipt" class="primary-button" type="button">Descargar PDF</button>
+      <button id="shareReceipt" class="share-payment" type="button">Compartir / WhatsApp</button>
+    </div>
+    <p id="receiptMessage" class="receipt-message" role="status"></p>
+  </section>
+</div>
+
+<div id="toast" class="toast" role="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script type="module" src="js/cobranza.js"></script>
+</body>
+</html>

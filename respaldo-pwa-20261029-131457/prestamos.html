@@ -1,0 +1,253 @@
+﻿
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#061D3D">
+<title>Préstamos | Préstamos La Bendición</title>
+<link rel="stylesheet" href="css/prestamos.css">
+<link rel="stylesheet" href="css/prestamos-extra.css">
+<link rel="stylesheet" href="css/prestamos-control.css">
+<link rel="stylesheet" href="css/historial-abonos.css">
+</head>
+<body>
+<div id="loading" class="loading">
+  <img src="imagenes/logo.png" alt="Préstamos La Bendición">
+  <p>VERIFICANDO ACCESO SEGURO</p>
+</div>
+
+<div id="app" class="layout" hidden>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <img src="imagenes/logo.png" alt="Logo">
+      <div>
+        <strong>PRÉSTAMOS</strong>
+        <span>LA BENDICIÓN</span>
+      </div>
+    </div>
+    <p class="nav-label">ADMINISTRACIÓN</p>
+    <nav class="nav">
+      <a href="admin.html">⌂ <span>Resumen general</span></a>
+      <a href="admin.html?seccion=usuarios">♙ <span>Empleados</span></a>
+      <a href="clientes.html">♧ <span>Clientes</span></a>
+      <a href="prestamos.html" class="active">▤ <span>Préstamos</span></a>
+      <a href="cobranza.html">▣ <span>Cobranza</span></a>
+      <a href="admin.html?seccion=reportes">▥ <span>Reportes</span></a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="profile">
+        <div class="avatar">A</div>
+        <div>
+          <strong id="adminName">ADMINISTRADOR</strong>
+          <small>Administrador general</small>
+        </div>
+      </div>
+      <button id="logout" class="logout">Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <div id="overlay" class="overlay"></div>
+
+  <div class="workspace">
+    <header class="topbar">
+      <div class="top-left">
+        <button id="menuButton" type="button" class="menu-button" aria-label="Abrir menú">☰</button>
+        <div>
+          <span class="breadcrumb">ADMINISTRACIÓN / PRÉSTAMOS</span>
+          <h1>Control de préstamos</h1>
+        </div>
+      </div>
+      <div class="top-avatar">A</div>
+    </header>
+
+    <main class="content">
+      <section class="heading">
+        <div>
+          <span class="eyebrow">CARTERA FINANCIERA</span>
+          <h2>Préstamos registrados</h2>
+          <p>Operaciones, calendarios y comprobantes de entrega.</p>
+        </div>
+        <button id="newLoan" class="primary-button" type="button">＋ Nuevo préstamo</button>
+      </section>
+
+      <section class="stats">
+        <article class="stat-card">
+          <span>Capital entregado</span>
+          <strong id="capitalTotal">$0.00</strong>
+          <small>Capital histórico registrado</small>
+        </article>
+        <article class="stat-card">
+          <span>Préstamos registrados</span>
+          <strong id="loanCount">0</strong>
+          <small>Operaciones existentes</small>
+        </article>
+        <article class="stat-card">
+          <span>Plazo concluido</span>
+          <strong id="lateCount">0</strong>
+          <small>Pendientes de revisión de pagos</small>
+        </article>
+        <article class="stat-card">
+          <span>Clientes con préstamos</span>
+          <strong id="borrowerCount">0</strong>
+          <small>Personas diferentes</small>
+        </article>
+      </section>
+
+      <div class="notice">
+        <strong>Información financiera</strong>
+        <p>El total pactado se registra explícitamente. La tasa es informativa hasta confirmar su método de cálculo. El calendario representa pagos puntuales y no sustituye el saldo real.</p>
+      </div>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h3>Historial de préstamos</h3>
+            <p id="resultCount">Cargando registros...</p>
+          </div>
+          <div class="filters">
+            <input id="search" type="search" placeholder="Buscar cliente o folio">
+            <select id="filter">
+              <option value="todos">Todos los préstamos</option>
+              <option value="vigente">Plazo vigente</option>
+              <option value="revision">Plazo concluido</option>
+              <option value="conRecibo">Con comprobante</option>
+              <option value="sinRecibo">Sin comprobante</option>
+            </select>
+          </div>
+        </div>
+        <div id="loanList" class="loan-list"></div>
+      </section>
+    </main>
+
+    <footer>© 2026 PRÉSTAMOS LA BENDICIÓN</footer>
+  </div>
+</div>
+
+<div id="loanModal" class="modal-backdrop" hidden>
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <header class="modal-header">
+      <div>
+        <span class="eyebrow">NUEVA OPERACIÓN</span>
+        <h2 id="modalTitle">Registrar préstamo</h2>
+      </div>
+      <button id="closeModal" class="close-button" type="button" aria-label="Cerrar">×</button>
+    </header>
+
+    <form id="loanForm">
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="field full">
+            <label for="clienteId">Cliente *</label>
+            <select id="clienteId" required>
+              <option value="">Selecciona un cliente</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="capital">Capital entregado (MXN) *</label>
+            <input id="capital" type="number" min="0.01" max="999999999.99" step="0.01" placeholder="5000.00" required>
+          </div>
+
+          <div class="field">
+            <label for="tasa">Tasa pactada (%) *</label>
+            <input id="tasa" type="number" min="0" max="100" step="0.01" placeholder="8.00" required>
+          </div>
+
+          <div class="field">
+            <label for="totalPactado">Total acordado a devolver (MXN) *</label>
+            <input id="totalPactado" type="number" min="0.01" max="999999999.99" step="0.01" placeholder="5400.00" required>
+          </div>
+
+          <div class="field">
+            <label for="abono">Importe habitual de cada abono *</label>
+            <input id="abono" type="number" min="0.01" max="999999999.99" step="0.01" placeholder="300.00" required>
+          </div>
+
+          <div class="field">
+            <label for="fechaEntrega">Fecha de entrega *</label>
+            <input id="fechaEntrega" type="date" required>
+          </div>
+
+          <div class="field">
+            <label for="intervaloDias">Pagar cada cuántos días *</label>
+            <div class="interval-field">
+              <input id="intervaloDias" type="number" min="1" max="365" step="1" value="4" required>
+              <span>días</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="fechaFin">Fecha prevista de finalización</label>
+            <input id="fechaFin" type="date" readonly required>
+          </div>
+
+          <div class="field">
+            <label for="empleadoId">Cobrador responsable</label>
+            <select id="empleadoId">
+              <option value="">Sin asignar</option>
+            </select>
+          </div>
+
+          <div class="field full">
+            <div class="schedule-preview" id="schedulePreview" aria-live="polite">
+              Introduce los importes para calcular el calendario.
+            </div>
+          </div>
+
+          <div class="field full">
+            <label for="observaciones">Condiciones y observaciones</label>
+            <textarea id="observaciones" rows="3" maxlength="500" placeholder="Condiciones pactadas con el cliente"></textarea>
+          </div>
+        </div>
+
+        <div class="confirmation-box">
+          <label class="confirmation-label">
+            <input type="checkbox" id="confirmDelivery" required>
+            <span>Confirmo que se entregó al cliente el capital indicado y que los datos capturados corresponden al acuerdo de préstamo.</span>
+          </label>
+          <p>El registro generará una constancia de entrega. No podrás eliminarla ni modificar el importe desde este panel.</p>
+        </div>
+
+        <p id="formMessage" class="form-error" role="alert"></p>
+      </div>
+
+      <div class="modal-footer">
+        <button id="cancelButton" class="secondary-button" type="button">Cancelar</button>
+        <button id="saveButton" class="primary-button" type="submit">Registrar y generar recibo</button>
+      </div>
+    </form>
+  </section>
+</div>
+
+<div id="receiptModal" class="modal-backdrop" hidden>
+  <section class="modal receipt-dialog" role="dialog" aria-modal="true" aria-labelledby="receiptTitle">
+    <header class="modal-header">
+      <div>
+        <span class="eyebrow">COMPROBANTE DIGITAL</span>
+        <h2 id="receiptTitle">Constancia de préstamo</h2>
+      </div>
+      <button id="closeReceipt" class="close-button" type="button" aria-label="Cerrar">×</button>
+    </header>
+
+    <div class="receipt-preview" id="receiptPreview"></div>
+
+    <div class="receipt-actions">
+      <button id="downloadReceipt" class="primary-button" type="button">Descargar PDF</button>
+      <button id="shareReceipt" class="share-button" type="button">Compartir / WhatsApp</button>
+      <button id="printReceipt" class="secondary-button" type="button">Imprimir</button>
+    </div>
+
+    <p id="receiptMessage" class="receipt-message" role="status"></p>
+  </section>
+</div>
+
+<div id="toast" class="toast" role="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script type="module" src="js/prestamos.js"></script>
+<script type="module" src="js/prestamos-control.js"></script>
+<script type="module" src="js/historial-abonos.js"></script>
+</body>
+</html>
+

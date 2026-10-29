@@ -1,0 +1,653 @@
+
+:root {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #102341;
+  background: #f4f6fa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button, input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.header {
+  height: 74px;
+  background: #061d3d;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 max(20px, calc((100vw - 1100px) / 2));
+  border-bottom: 1px solid #c9a35a50;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-brand img {
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+}
+
+.header-brand strong,
+.header-brand small {
+  display: block;
+  font-family: Georgia, serif;
+  color: #e7c47f;
+}
+
+.header-brand strong {
+  font-size: 16px;
+}
+
+.header-brand small {
+  font-size: 11px;
+}
+
+.logout-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #e8d4b4;
+  background: #ffffff12;
+  border: 1px solid #ffffff20;
+  border-radius: 9px;
+  padding: 11px 13px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px 110px;
+}
+
+.welcome {
+  position: relative;
+  background: linear-gradient(130deg, #061d3d, #143c69);
+  padding: 29px;
+  color: white;
+  border-radius: 19px;
+  overflow: hidden;
+  margin-bottom: 19px;
+}
+
+.welcome::after {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border: 1px solid #c9a35a55;
+  border-radius: 50%;
+  right: -90px;
+  top: -90px;
+  pointer-events: none;
+}
+
+.eyebrow {
+  display: block;
+  letter-spacing: 1.8px;
+  font-size: 10px;
+  color: #aa8548;
+  font-weight: 800;
+}
+
+.welcome .eyebrow {
+  color: #e5bf71;
+}
+
+.welcome h1 {
+  margin: 10px 0;
+  font-size: clamp(24px, 4vw, 32px);
+}
+
+.welcome p {
+  max-width: 480px;
+  color: #c6d4e6;
+  font-size: 13px;
+  line-height: 1.8;
+  margin-bottom: 18px;
+}
+
+.welcome-date {
+  display: inline-flex;
+  padding: 10px 13px;
+  background: #ffffff14;
+  border: 1px solid #ffffff15;
+  border-radius: 9px;
+  font-size: 12px;
+  color: #eed298;
+  text-transform: capitalize;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.metric {
+  background: white;
+  border: 1px solid #e6ebf2;
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.metric span,
+.metric small {
+  display: block;
+  font-size: 11px;
+  color: #7b8ba0;
+}
+
+.metric strong {
+  display: block;
+  font-size: 31px;
+  margin: 12px 0;
+  color: #061d3d;
+}
+
+.metric small {
+  line-height: 1.5;
+  font-size: 10px;
+}
+
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin: 0 0 16px;
+}
+
+.section-title h2 {
+  font-size: 22px;
+  color: #061d3d;
+  margin: 8px 0;
+}
+
+.section-title p {
+  color: #8a97a9;
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.next-title {
+  margin-top: 28px;
+}
+
+.cards {
+  display: grid;
+  gap: 13px;
+}
+
+.visit-card,
+.customer-card,
+.loan-card {
+  border-radius: 14px;
+  border: 1px solid #e6eaf1;
+  background: white;
+  padding: 19px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.card-icon {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: #eef2f8;
+  color: #173d66;
+  border-radius: 12px;
+  font-weight: 900;
+  font-size: 17px;
+}
+
+.card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-content h3 {
+  font-size: 14px;
+  margin: 3px 0 9px;
+  overflow-wrap: anywhere;
+}
+
+.card-content p {
+  font-size: 12px;
+  color: #7b8a9f;
+  margin: 6px 0;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.card-tag {
+  display: inline-flex;
+  background: #f0f4fa;
+  color: #46617d;
+  border-radius: 20px;
+  padding: 7px 10px;
+  margin: 6px 6px 0 0;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.card-tag.gold {
+  background: #fff4db;
+  color: #93661c;
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.card-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  border-radius: 9px;
+  border: 1px solid #dce3ed;
+  background: white;
+  color: #102b4a;
+  padding: 11px 13px;
+  font-size: 11px;
+  font-weight: 800;
+  min-height: 40px;
+}
+
+.card-button.primary {
+  background: #061d3d;
+  color: white;
+  border-color: #061d3d;
+}
+
+.card-button.gold {
+  background: #c9a35a;
+  color: #061d3d;
+  border-color: #c9a35a;
+}
+
+.search-box {
+  margin-bottom: 18px;
+}
+
+.search-box input {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #dce4ef;
+  padding: 13px 15px;
+  border-radius: 10px;
+  background: white;
+  outline: none;
+  font-size: 13px;
+}
+
+.search-box input:focus {
+  border-color: #c9a35a;
+  box-shadow: 0 0 0 3px #c9a35a25;
+}
+
+.empty {
+  background: white;
+  border: 1px dashed #d5dfea;
+  padding: 30px 20px;
+  border-radius: 13px;
+  color: #74849a;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.info-box {
+  margin-top: 20px;
+  background: #fff7e7;
+  color: #81612c;
+  border: 1px solid #ead9ad;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.account-card {
+  background: white;
+  border: 1px solid #e5eaf1;
+  border-radius: 15px;
+  padding: 36px 20px;
+  text-align: center;
+}
+
+.account-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  margin: 0 auto 15px;
+  display: grid;
+  place-items: center;
+  background: #c9a35a;
+  color: #061d3d;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.account-card h3 {
+  font-size: 17px;
+  margin: 0 0 10px;
+}
+
+.account-card p {
+  font-size: 12px;
+  color: #718098;
+  overflow-wrap: anywhere;
+}
+
+.account-role {
+  display: inline-block;
+  margin-top: 15px;
+  background: #e7f5ee;
+  color: #237a50;
+  padding: 9px 13px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.bottom-nav {
+  position: fixed;
+  z-index: 30;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  border-top: 1px solid #e5eaf0;
+  display: flex;
+  justify-content: center;
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  box-shadow: 0 -6px 22px #071d3810;
+}
+
+.tab {
+  width: min(25%, 165px);
+  border: 0;
+  background: transparent;
+  border-radius: 10px;
+  color: #8391a5;
+  padding: 8px 5px;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.tab svg {
+  height: 21px;
+  width: 21px;
+}
+
+.tab.active {
+  background: #f0f4fa;
+  color: #061d3d;
+}
+
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  background: #061d3d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  text-align: center;
+  z-index: 100;
+}
+
+.loading-logo {
+  width: 115px;
+  height: 115px;
+  border: 1px solid #c9a35a45;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+  animation: float 1.8s ease-in-out infinite alternate;
+}
+
+.loading-logo img {
+  height: 100px;
+  width: 100px;
+  object-fit: contain;
+}
+
+.loading-screen > span {
+  color: #edc77e;
+  font-family: Georgia, serif;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.loading-screen p {
+  color: #c9a35a;
+  font-size: 10px;
+  letter-spacing: 2px;
+}
+
+.loading-line {
+  width: 150px;
+  height: 3px;
+  background: #ffffff20;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.loading-line span {
+  display: block;
+  height: 100%;
+  width: 45%;
+  background: #c9a35a;
+  animation: sweep 1.3s ease-in-out infinite alternate;
+}
+
+@keyframes sweep {
+  to { transform: translateX(125%); }
+}
+
+@keyframes float {
+  to { transform: translateY(-7px); }
+}
+
+.modal-backdrop {
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  background: #071326c9;
+  display: grid;
+  place-items: center;
+  padding: 15px;
+}
+
+.details-modal {
+  width: 100%;
+  max-width: 560px;
+  max-height: 92dvh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 16px;
+}
+
+.details-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px;
+  border-bottom: 1px solid #edf0f4;
+}
+
+.details-header h2 {
+  font-size: 19px;
+  margin: 8px 0 0;
+}
+
+.details-header button {
+  width: 38px;
+  height: 38px;
+  background: #eef2f6;
+  border: 0;
+  border-radius: 50%;
+  font-size: 24px;
+}
+
+.details-body {
+  padding: 22px;
+}
+
+.detail-row {
+  border-bottom: 1px solid #edf0f4;
+  padding: 12px 0;
+}
+
+.detail-row span {
+  display: block;
+  color: #7d899b;
+  font-size: 11px;
+}
+
+.detail-row strong {
+  display: block;
+  margin-top: 7px;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.details-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 15px 22px;
+  border-top: 1px solid #edf0f4;
+}
+
+.details-footer button {
+  background: #061d3d;
+  color: white;
+  border: 0;
+  padding: 13px 23px;
+  border-radius: 9px;
+}
+
+.toast {
+  display: none;
+  position: fixed;
+  z-index: 120;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #061d3d;
+  color: white;
+  padding: 14px 19px;
+  border-radius: 9px;
+  font-size: 12px;
+  max-width: 90%;
+  box-shadow: 0 10px 35px #0003;
+}
+
+.toast.show {
+  display: block;
+}
+
+@media(max-width: 700px) {
+  .header {
+    padding: 0 16px;
+  }
+
+  .main {
+    padding: 17px 13px 110px;
+  }
+
+  .welcome {
+    padding: 23px 19px;
+  }
+
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .metric {
+    padding: 17px;
+  }
+
+  .metric strong {
+    font-size: 26px;
+  }
+
+  .visit-card,
+  .customer-card,
+  .loan-card {
+    padding: 15px;
+    gap: 11px;
+  }
+
+  .card-icon {
+    width: 39px;
+    height: 39px;
+    border-radius: 10px;
+  }
+
+  .card-actions .card-button {
+    flex: 1;
+  }
+}
+
+@media(max-width: 360px) {
+  .header-brand strong {
+    font-size: 13px;
+  }
+
+  .header-brand small {
+    font-size: 10px;
+  }
+
+  .header-brand img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .logout-button {
+    padding: 9px;
+  }
+
+  .logout-button span {
+    display: none;
+  }
+}

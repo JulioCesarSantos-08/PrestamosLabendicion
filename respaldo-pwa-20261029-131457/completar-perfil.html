@@ -1,0 +1,241 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#061D3D">
+<title>Completar perfil | Préstamos La Bendición</title>
+<link rel="stylesheet" href="css/auth.css">
+<style>
+.profile-page {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #12385f, #061d3d 70%);
+  display: grid;
+  place-items: center;
+  padding: 22px;
+}
+.profile-card {
+  width: 100%;
+  max-width: 450px;
+  background: #fff;
+  padding: 35px;
+  border-radius: 20px;
+  box-shadow: 0 25px 70px #0003;
+}
+.profile-logo {
+  width: 100px;
+  height: 100px;
+  display: block;
+  object-fit: contain;
+  margin: 0 auto 20px;
+}
+.profile-card h1 {
+  font-size: 25px;
+  text-align: center;
+  color: #061d3d;
+  margin: 0 0 12px;
+}
+.profile-description {
+  color: #778294;
+  text-align: center;
+  line-height: 1.7;
+  font-size: 13px;
+  margin-bottom: 28px;
+}
+.profile-hint {
+  font-size: 11px;
+  color: #778294;
+  margin-top: 7px;
+  display: block;
+}
+.profile-message {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #a12d2d;
+  text-align: center;
+  margin-top: 15px;
+}
+@media(max-width: 480px) {
+  .profile-card { padding: 25px 20px; }
+}
+</style>
+</head>
+<body>
+<main class="profile-page">
+<section class="profile-card">
+<img src="imagenes/logo.png" alt="Préstamos La Bendición" class="profile-logo">
+
+<h1>Completa tu registro</h1>
+
+<p class="profile-description">
+Tu cuenta ya existe, pero necesitamos completar tus datos
+para solicitar autorización al administrador.
+</p>
+
+<form id="profileForm">
+<div class="field">
+<label for="nombre">Nombre completo</label>
+<input
+id="nombre"
+type="text"
+minlength="12"
+maxlength="120"
+autocomplete="name"
+placeholder="NOMBRE COMPLETO"
+required
+>
+<small class="profile-hint">Mínimo 12 caracteres. Se guardará en mayúsculas.</small>
+</div>
+
+<div class="field">
+<label for="correo">Correo electrónico</label>
+<input id="correo" type="email" readonly>
+</div>
+
+<button id="saveButton" type="submit" class="primary-button">
+Guardar y solicitar autorización
+</button>
+</form>
+
+<button id="logoutButton" class="secondary-button" type="button">
+Cerrar sesión
+</button>
+
+<p id="message" class="profile-message" role="alert"></p>
+</section>
+</main>
+
+<script type="module">
+import { auth, db } from "./js/firebase.js";
+import {
+  onAuthStateChanged,
+  updateProfile,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+const $ = id => document.getElementById(id);
+let currentUser = null;
+let saving = false;
+
+function normalizeName(value) {
+  return value
+    .normalize("NFC")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLocaleUpperCase("es-MX");
+}
+
+function showMessage(text) {
+  $("message").textContent = text;
+}
+
+$("nombre").addEventListener("input", event => {
+  const input = event.target;
+  const start = input.selectionStart;
+  const end = input.selectionEnd;
+
+  input.value = input.value.toLocaleUpperCase("es-MX");
+
+  if (start !== null && end !== null) {
+    input.setSelectionRange(start, end);
+  }
+});
+
+onAuthStateChanged(auth, async user => {
+  if (!user) {
+    location.replace("index.html");
+    return;
+  }
+
+  currentUser = user;
+
+  if (!user.email) {
+    showMessage(
+      "Esta pantalla requiere una cuenta con correo electrónico."
+    );
+    $("saveButton").disabled = true;
+    return;
+  }
+
+  $("correo").value = user.email;
+  $("nombre").value = normalizeName(user.displayName || "");
+
+  try {
+    const snapshot = await getDoc(doc(db, "usuarios", user.uid));
+
+    if (snapshot.exists()) {
+      location.replace("index.html");
+    }
+  } catch (error) {
+    showMessage(
+      "No se pudo verificar el perfil: " + error.message
+    );
+  }
+});
+
+$("profileForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  if (saving || !currentUser) return;
+
+  const nombre = normalizeName($("nombre").value);
+
+  if (nombre.length < 12 || nombre.length > 120) {
+    showMessage(
+      "El nombre debe tener entre 12 y 120 caracteres."
+    );
+    return;
+  }
+
+  saving = true;
+  $("saveButton").disabled = true;
+  $("saveButton").textContent = "Guardando...";
+  showMessage("");
+
+  try {
+    const reference = doc(db, "usuarios", currentUser.uid);
+    const existing = await getDoc(reference);
+
+    if (existing.exists()) {
+      location.replace("index.html");
+      return;
+    }
+
+    await setDoc(reference, {
+      uid: currentUser.uid,
+      nombre,
+      correo: currentUser.email,
+      telefono: "",
+      rol: "pendiente",
+      estado: "pendiente",
+      creadoEn: serverTimestamp()
+    });
+
+    await updateProfile(currentUser, {
+      displayName: nombre
+    });
+
+    location.replace("index.html");
+  } catch (error) {
+    showMessage("No se pudo guardar el perfil: " + error.message);
+  } finally {
+    saving = false;
+    $("saveButton").disabled = false;
+    $("saveButton").textContent = "Guardar y solicitar autorización";
+  }
+});
+
+$("logoutButton").addEventListener("click", async () => {
+  await signOut(auth);
+  location.replace("index.html");
+});
+</script>
+</body>
+</html>
