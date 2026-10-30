@@ -209,9 +209,28 @@ service cloud.firestore {
 
       allow delete: if false;
     }
-match /{document=**} {
+    match /configuracionFondo/{id} {
+      allow get: if id == "principal" && admin();
+      allow list: if false;
+      allow create: if id == "principal" && admin() &&
+        request.resource.data.keys().hasOnly([
+          "saldoInicialCentavos", "abiertoEn", "creadoPor"
+        ]) &&
+        request.resource.data.keys().hasAll([
+          "saldoInicialCentavos", "abiertoEn", "creadoPor"
+        ]) &&
+        request.resource.data.saldoInicialCentavos is int &&
+        request.resource.data.saldoInicialCentavos > 0 &&
+        request.resource.data.saldoInicialCentavos <= 1000000000000 &&
+        request.resource.data.abiertoEn == request.time &&
+        request.resource.data.creadoPor == request.auth.uid;
+      allow update, delete: if false;
+    }
+    match /{document=**} {
       allow read, write: if false;
     }
   }
 }
+
+
 
