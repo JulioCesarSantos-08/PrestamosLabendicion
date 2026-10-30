@@ -14,3 +14,9 @@ firebase-adminsdk*.json
 pruebas-seguridad/
 firestore.rules.propuesta
 .firebase/
+
+respaldo-*/
+*.verificacion.js
+firestore.rules.danado.*
+pruebas-seguridad/
+firestore.rules.propuesta

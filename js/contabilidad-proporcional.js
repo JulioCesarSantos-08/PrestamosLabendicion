@@ -1,4 +1,4 @@
-
+﻿
 import { auth, db } from "./firebase.js";
 import {
   onAuthStateChanged
@@ -20,8 +20,10 @@ const $ = id => document.getElementById(id);
 let version = 0;
 let cancelarPrestamos = null;
 let cancelarSaldos = null;
+let cancelarGastos = null;
 let prestamos = null;
 let saldos = null;
+let gastos = null;
 
 function dinero(centavos) {
   return moneda.format(centavos / 100);
@@ -48,7 +50,7 @@ function distribuir(capital, total, abonado) {
 }
 
 function calcular() {
-  if (!prestamos || !saldos) return null;
+  if (!prestamos || !saldos || !gastos) return null;
 
   const resultado = {
     capitalEntregado: 0,
@@ -59,9 +61,29 @@ function calcular() {
     rendimientoPactado: 0,
     totalAbonado: 0,
     saldoPendiente: 0,
+    gastosOperativos: 0,
+    cantidadGastos: 0,
+    resultadoOperativo: 0,
     incompletos: 0,
     validos: 0
   };
+
+  for (const gasto of gastos) {
+    const importe = gasto.importeCentavos;
+    const estado = typeof gasto.estado === "string"
+      ? gasto.estado.toLowerCase()
+      : "activo";
+
+    if (
+      importeValido(importe) &&
+      estado !== "anulado" &&
+      estado !== "cancelado" &&
+      estado !== "eliminado"
+    ) {
+      resultado.gastosOperativos += importe;
+      resultado.cantidadGastos++;
+    }
+  }
 
   for (const prestamo of prestamos) {
     const capital = prestamo.capitalCentavos;
@@ -97,6 +119,9 @@ function calcular() {
     resultado.saldoPendiente += total - abonado;
   }
 
+  resultado.resultadoOperativo =
+    resultado.interesesCobrados - resultado.gastosOperativos;
+
   return resultado;
 }
 
@@ -115,6 +140,8 @@ function pintar() {
   pintarImporte("contCapital", datos.capitalEntregado);
   pintarImporte("contRecuperado", datos.capitalRecuperado);
   pintarImporte("contIntereses", datos.interesesCobrados);
+  pintarImporte("contGastos", datos.gastosOperativos);
+  pintarImporte("contResultadoOperativo", datos.resultadoOperativo);
   pintarImporte("contCapitalPendiente", datos.capitalPendiente);
   pintarImporte("contInteresesPendientes", datos.interesesPendientes);
   pintarImporte("contSaldo", datos.saldoPendiente);
@@ -127,7 +154,8 @@ function pintar() {
   pintarTexto(
     "contNota",
     `${datos.validos} préstamos con datos completos. ` +
-    `${datos.incompletos} registros requieren revisión.`
+    `${datos.incompletos} registros requieren revisión. ` +
+    `${datos.cantidadGastos} gasto(s) activos integrados al resumen.`
   );
 
   pintarTexto(
@@ -140,11 +168,14 @@ function pintar() {
 function limpiar() {
   if (cancelarPrestamos) cancelarPrestamos();
   if (cancelarSaldos) cancelarSaldos();
+  if (cancelarGastos) cancelarGastos();
 
   cancelarPrestamos = null;
   cancelarSaldos = null;
+  cancelarGastos = null;
   prestamos = null;
   saldos = null;
+  gastos = null;
 }
 
 function mensajeError(mensaje) {
@@ -192,6 +223,25 @@ function conectar(numero) {
       }
     }
   );
+
+  cancelarGastos = onSnapshot(
+    collection(db, "gastos"),
+    resultado => {
+      if (numero !== version) return;
+
+      gastos = resultado.docs.map(documento => ({
+        id: documento.id,
+        ...documento.data()
+      }));
+
+      pintar();
+    },
+    error => {
+      if (numero === version) {
+        mensajeError("Error consultando gastos: " + error.message);
+      }
+    }
+  );
 }
 
 onAuthStateChanged(auth, async usuario => {
@@ -220,3 +270,4 @@ onAuthStateChanged(auth, async usuario => {
     }
   }
 });
+

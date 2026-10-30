@@ -147,6 +147,7 @@ async function verRecibo(pago) {
       contenido.append(fila("Observaciones", recibo.nota));
     }
 
+    contenido.append(fila("Atención y aclaraciones", "Cualquier duda o inconveniente, comunicarse al 954 148 9953."));
     const acciones = elemento("div", "historial-abonos-acciones");
 
     const descargar = elemento("button", "", "Descargar recibo PDF");
@@ -213,6 +214,9 @@ async function verRecibo(pago) {
         align: "right"
       });
 
+      pdf.setTextColor(90, 105, 125);
+      pdf.setFontSize(8);
+      pdf.text("Dudas o inconvenientes: 954 148 9953", 105, 274, { align: "center" });
       pdf.save(`ABONO-${pago.id}.pdf`);
     });
 
@@ -443,4 +447,5 @@ onAuthStateChanged(auth, async usuario => {
     console.error("No se pudo cargar el historial:", error);
   }
 });
+
 

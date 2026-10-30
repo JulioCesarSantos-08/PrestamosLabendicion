@@ -572,6 +572,7 @@ function showReceipt(receipt) {
   );
   paper.append(signatures);
 
+  paper.append(make("p", "receipt-note", "Cualquier duda o inconveniente, comunicarse al 954 148 9953."));
   $("receiptPreview").replaceChildren(paper);
   $("receiptMessage").textContent =
     "El comprobante está guardado en Firestore. Puedes volver a generarlo desde el historial.";
@@ -736,7 +737,9 @@ async function createPDF(receipt) {
     180
   );
 
-  pdf.text(legalText, 105, 271, { align: "center" });
+  pdf.text(legalText, 105, 263, { align: "center" });
+  pdf.setFontSize(8);
+  pdf.text("Dudas o inconvenientes: 954 148 9953", 105, 276, { align: "center" });
 
   pdf.setDrawColor(...gold);
   pdf.line(15, 281, 195, 281);
@@ -1010,4 +1013,5 @@ onAuthStateChanged(auth, async user => {
     toast(error.message);
   }
 });
+
 

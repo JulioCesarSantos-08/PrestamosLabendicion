@@ -44,6 +44,10 @@ nav{display:grid;gap:5px;padding:0 12px}
 .stat,.section-card,.empty-page{background:#fff;border:1px solid #e9edf2;border-radius:14px;padding:23px;box-shadow:0 3px 15px #10294b05}
 .stat span,.stat small{display:block;color:#7b889a;font-size:12px}
 .stat strong{display:block;font-size:29px;color:#061d3d;margin:15px 0}
+.stat-danger{background:#fff5f5;border-color:#f2c9c9}
+.stat-danger strong{color:#b42318}
+.stat-success{background:#f3fff7;border-color:#cfe9da}
+.stat-success strong{color:#067647}
 .stat small{font-size:10px;line-height:1.5}
 .section-heading{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:23px}
 .section-heading h2,.section-heading h3{margin:0;color:#102541}

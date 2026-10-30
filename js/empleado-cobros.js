@@ -444,6 +444,7 @@ async function showReceipt(receipt) {
     "Comprobante de abono registrado digitalmente. El saldo se calcula sobre el total pactado, con separacion proporcional de capital e intereses cuando los datos estan disponibles."
   ));
 
+  paper.append(node("p", "employee-receipt-legal", "Cualquier duda o inconveniente, comunicarse al 954 148 9953."));
   $c("employeeReceiptContent").replaceChildren(paper);
   $c("employeeReceiptMessage").textContent = "";
   $c("employeeReceiptModal").hidden = false;
@@ -527,6 +528,9 @@ async function generatePDF(receipt) {
     y + 45
   );
 
+  pdf.setTextColor(90, 105, 125);
+  pdf.setFontSize(8);
+  pdf.text("Dudas o inconvenientes: 954 148 9953", 105, 274, { align: "center" });
   return pdf;
 }
 
@@ -783,5 +787,6 @@ onAuthStateChanged(auth, async account => {
     console.error("Error de autorización de cobranza:", error);
   }
 });
+
 
 

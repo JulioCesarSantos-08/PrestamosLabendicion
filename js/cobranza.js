@@ -491,6 +491,7 @@ function showReceipt(receipt) {
     "Comprobante de abono registrado digitalmente. El importe y saldo corresponden al total pactado del préstamo, con separacion proporcional de capital e intereses."
   ));
 
+  paper.append(make("p", "payment-receipt-note", "Cualquier duda o inconveniente, comunicarse al 954 148 9953."));
   $("receiptContent").replaceChildren(paper);
   $("receiptMessage").textContent = "El comprobante permanece registrado en Firestore.";
   $("receiptModal").hidden = false;
@@ -595,6 +596,9 @@ async function createPDF(receipt) {
   pdf.setFontSize(8);
   pdf.text("PRESTAMOS LA BENDICION", 105, 286, { align: "center" });
 
+  pdf.setTextColor(90, 105, 125);
+  pdf.setFontSize(8);
+  pdf.text("Dudas o inconvenientes: 954 148 9953", 105, 274, { align: "center" });
   return pdf;
 }
 
@@ -776,5 +780,6 @@ onAuthStateChanged(auth, async user => {
     toast(error.message);
   }
 });
+
 
 

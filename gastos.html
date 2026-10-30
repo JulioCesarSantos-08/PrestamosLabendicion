@@ -1,0 +1,191 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#061d3d">
+<title>Gastos y Finanzas | Préstamos La Bendición</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png">
+<style>
+:root{--navy:#061d3d;--gold:#cba459;--bg:#f3f6fb;--border:#e0e7f0;--muted:#73849c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--navy);font-family:Arial,sans-serif;font-size:14px}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+header{background:var(--navy);color:white;padding:18px max(18px,calc((100vw - 1200px)/2));display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:white;font-weight:800}
+.brand img{width:45px;height:45px;object-fit:contain}
+header a.back{color:var(--gold);text-decoration:none;font-weight:700}
+main{max-width:1200px;margin:30px auto;padding:0 18px 50px}
+.heading{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:25px}
+.eyebrow{font-size:11px;color:#a47a32;font-weight:800;letter-spacing:1.5px}
+h1{font-family:Georgia,serif;font-size:30px;margin:8px 0}
+p{line-height:1.6}
+.muted{color:var(--muted);font-size:12px}
+.btn{background:var(--navy);color:white;padding:12px 16px;border:0;border-radius:9px;font-weight:700}
+.btn.gold{background:var(--gold);color:var(--navy)}
+.btn.light{background:white;color:var(--navy);border:1px solid var(--border)}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:23px}
+.card,.panel{background:white;border:1px solid var(--border);border-radius:13px;padding:20px}
+.card span{display:block;color:var(--muted);font-size:12px;margin-bottom:12px}
+.card strong{font-size:24px;overflow-wrap:anywhere}
+.card small{display:block;color:var(--muted);margin-top:10px}
+.panel{margin-bottom:20px}
+.panel h2{font-family:Georgia,serif;font-size:20px;margin:0 0 16px}
+.filters{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:12px;align-items:end}
+.field{display:grid;gap:7px}
+label{font-size:12px;font-weight:700}
+input,select,textarea{min-width:0;width:100%;border:1px solid #d5dfed;border-radius:9px;padding:12px;color:var(--navy);background:white}
+textarea{min-height:80px;resize:vertical}
+.list{display:grid;gap:11px}
+.entry{border:1px solid var(--border);border-radius:11px;padding:15px;display:flex;justify-content:space-between;gap:14px;align-items:center}
+.entry h3{font-size:14px;margin:0 0 6px}
+.entry p{color:var(--muted);margin:3px 0;font-size:12px}
+.entry strong{font-size:17px}
+.entry-actions{display:flex;gap:7px;justify-content:end;margin-top:10px}
+.entry-actions button{border:1px solid var(--border);background:#fff;padding:8px 10px;border-radius:7px;font-size:12px}
+.entry.anulado{opacity:.55}
+.empty{text-align:center;padding:30px;color:var(--muted)}
+#mensaje{font-size:12px;margin:10px 0;color:#a13939}
+.dialog-back{position:fixed;inset:0;background:#061d3dbb;display:grid;place-items:center;z-index:100;padding:15px}
+.dialog{background:white;border-radius:15px;padding:24px;width:min(560px,100%);max-height:90dvh;overflow:auto}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.full{grid-column:1/-1}
+.actions{display:flex;gap:10px;justify-content:end;margin-top:20px}
+#cargando{padding:70px;text-align:center}
+@media(max-width:900px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:550px){h1{font-size:25px}.cards{gap:9px}.card,.panel{padding:14px}.card strong{font-size:19px}.filters,.form-grid{grid-template-columns:1fr}.entry{align-items:start}.dialog{padding:16px}}
+</style>
+</head>
+<body>
+<header>
+<a class="brand" href="admin.html">
+<img src="imagenes/logo.png" alt="Préstamos La Bendición">
+<span>PRÉSTAMOS<br>LA BENDICIÓN</span>
+</a>
+<a class="back" href="admin.html">Volver al administrador</a>
+</header>
+
+<div id="cargando">Verificando acceso del administrador...</div>
+
+<main id="app" hidden>
+<div class="heading">
+<div>
+<span class="eyebrow">CONTROL ADMINISTRATIVO</span>
+<h1>Gastos y Finanzas</h1>
+<p class="muted">Control de egresos y resultado operativo del negocio.</p>
+</div>
+<button id="nuevoGasto" class="btn gold">+ Registrar gasto</button>
+</div>
+
+<div class="cards">
+<div class="card">
+<span>Intereses cobrados</span>
+<strong id="intereses">$0.00</strong>
+<small>Periodo seleccionado</small>
+</div>
+<div class="card">
+<span>Gastos operativos</span>
+<strong id="totalGastos">$0.00</strong>
+<small>Gastos activos del periodo</small>
+</div>
+<div class="card">
+<span>Resultado operativo estimado</span>
+<strong id="resultado">$0.00</strong>
+<small>Intereses menos gastos</small>
+</div>
+<div class="card">
+<span>Gastos registrados</span>
+<strong id="cantidad">0</strong>
+<small>Movimientos activos del periodo</small>
+</div>
+</div>
+
+<section class="panel">
+<h2>Consultar movimientos</h2>
+<div class="filters">
+<div class="field"><label for="desde">Desde</label><input id="desde" type="date"></div>
+<div class="field"><label for="hasta">Hasta</label><input id="hasta" type="date"></div>
+<div class="field"><label for="categoriaFiltro">Categoría</label>
+<select id="categoriaFiltro"><option value="">Todas las categorías</option></select>
+</div>
+<div class="field"><label for="estadoFiltro">Estado</label>
+<select id="estadoFiltro">
+<option value="activo">Activos</option>
+<option value="anulado">Anulados</option>
+<option value="todos">Todos</option>
+</select>
+</div>
+<button id="limpiar" class="btn light">Todo el historial</button>
+</div>
+<p class="muted">Los indicadores utilizan las fechas seleccionadas. La categoría solamente filtra la lista de gastos.</p>
+</section>
+
+<section class="panel">
+<div class="heading">
+<h2>Historial de gastos</h2>
+<button id="exportar" class="btn light">Exportar CSV</button>
+</div>
+<div id="lista" class="list"></div>
+<p id="mensaje"></p>
+</section>
+</main>
+
+<div id="modal" class="dialog-back" hidden>
+<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="tituloModal">
+<h2 id="tituloModal">Registrar gasto</h2>
+<form id="formGasto">
+<div class="form-grid">
+<div class="field full">
+<label for="concepto">Concepto *</label>
+<input id="concepto" maxlength="120" required placeholder="Ej. Gasolina para moto">
+</div>
+<div class="field">
+<label for="categoria">Categoría *</label>
+<select id="categoria" required></select>
+</div>
+<div class="field">
+<label for="importe">Importe (MXN) *</label>
+<input id="importe" inputmode="decimal" placeholder="150.00" required>
+</div>
+<div class="field">
+<label for="fecha">Fecha del gasto *</label>
+<input type="date" id="fecha" required>
+</div>
+<div class="field">
+<label for="medio">Medio de pago</label>
+<select id="medio">
+<option value="efectivo">Efectivo</option>
+<option value="transferencia">Transferencia</option>
+<option value="tarjeta">Tarjeta</option>
+</select>
+</div>
+<div class="field">
+<label for="empleadoId">Empleado relacionado</label>
+<select id="empleadoId"><option value="">Sin empleado</option></select>
+</div>
+<div class="field">
+<label for="vehiculo">Motocicleta o vehículo</label>
+<input id="vehiculo" maxlength="80" placeholder="Ej. Moto 1">
+</div>
+<div class="field full">
+<label for="nota">Descripción u observaciones</label>
+<textarea id="nota" maxlength="500"></textarea>
+</div>
+</div>
+<p id="formError"></p>
+<div class="actions">
+<button type="button" class="btn light" id="cancelar">Cancelar</button>
+<button type="submit" class="btn gold" id="guardar">Guardar gasto</button>
+</div>
+</form>
+</div>
+</div>
+
+<script type="module" src="js/gastos.js"></script>
+<script src="js/pwa.js" defer></script>
+</body>
+</html>

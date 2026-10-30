@@ -90,8 +90,128 @@ service cloud.firestore {
       );
       allow update, delete: if false;
     }
-    match /{document=**} {
+        match /gastos/{id} {
+      allow read: if admin();
+
+      allow create: if admin() &&
+        request.resource.data.keys().hasOnly([
+          "concepto", "categoria", "importeCentavos",
+          "fecha", "medio", "empleadoId", "vehiculo",
+          "nota", "estado", "motivoAnulacion",
+          "creadoPor", "creadoEn",
+          "actualizadoPor", "actualizadoEn"
+        ]) &&
+        request.resource.data.keys().hasAll([
+          "concepto", "categoria", "importeCentavos",
+          "fecha", "medio", "empleadoId", "vehiculo",
+          "nota", "estado", "motivoAnulacion",
+          "creadoPor", "creadoEn",
+          "actualizadoPor", "actualizadoEn"
+        ]) &&
+        request.resource.data.estado == "activo" &&
+        request.resource.data.motivoAnulacion == "" &&
+        request.resource.data.creadoPor == request.auth.uid &&
+        request.resource.data.actualizadoPor == request.auth.uid &&
+        request.resource.data.creadoEn == request.time &&
+        request.resource.data.actualizadoEn == request.time &&
+        request.resource.data.importeCentavos is int &&
+        request.resource.data.importeCentavos > 0 &&
+        request.resource.data.importeCentavos <= 10000000000 &&
+        request.resource.data.concepto is string &&
+        request.resource.data.concepto.size() >= 3 &&
+        request.resource.data.concepto.size() <= 120 &&
+        request.resource.data.categoria in [
+          "Gasolina",
+          "Mantenimiento de motos",
+          "Sueldos y nómina",
+          "Renta",
+          "Luz y agua",
+          "Internet y teléfono",
+          "Papelería e insumos",
+          "Seguros y trámites",
+          "Otros"
+        ] &&
+        request.resource.data.fecha is string &&
+        request.resource.data.fecha.matches(
+          "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        ) &&
+        request.resource.data.medio in [
+          "efectivo", "transferencia", "tarjeta"
+        ] &&
+        request.resource.data.empleadoId is string &&
+        request.resource.data.vehiculo is string &&
+        request.resource.data.vehiculo.size() <= 80 &&
+        request.resource.data.nota is string &&
+        request.resource.data.nota.size() <= 500;
+
+      allow update: if admin() &&
+        resource.data.estado == "activo" &&
+        request.resource.data.keys().hasAll(
+          resource.data.keys()
+        ) &&
+        request.resource.data.creadoPor ==
+          resource.data.creadoPor &&
+        request.resource.data.creadoEn ==
+          resource.data.creadoEn &&
+        request.resource.data.actualizadoPor ==
+          request.auth.uid &&
+        request.resource.data.actualizadoEn ==
+          request.time &&
+        request.resource.data.importeCentavos is int &&
+        request.resource.data.importeCentavos > 0 &&
+        request.resource.data.importeCentavos <= 10000000000 &&
+        request.resource.data.concepto is string &&
+        request.resource.data.concepto.size() >= 3 &&
+        request.resource.data.concepto.size() <= 120 &&
+        request.resource.data.categoria in [
+          "Gasolina",
+          "Mantenimiento de motos",
+          "Sueldos y nómina",
+          "Renta",
+          "Luz y agua",
+          "Internet y teléfono",
+          "Papelería e insumos",
+          "Seguros y trámites",
+          "Otros"
+        ] &&
+        request.resource.data.fecha is string &&
+        request.resource.data.medio in [
+          "efectivo", "transferencia", "tarjeta"
+        ] &&
+        request.resource.data.empleadoId is string &&
+        request.resource.data.vehiculo is string &&
+        request.resource.data.vehiculo.size() <= 80 &&
+        request.resource.data.nota is string &&
+        request.resource.data.nota.size() <= 500 &&
+        (
+          (
+            request.resource.data.estado == "activo" &&
+            request.resource.data.motivoAnulacion == "" &&
+            request.resource.data.diff(resource.data)
+              .affectedKeys().hasOnly([
+                "concepto", "categoria", "importeCentavos",
+                "fecha", "medio", "empleadoId", "vehiculo",
+                "nota", "actualizadoPor", "actualizadoEn"
+              ])
+          ) ||
+          (
+            request.resource.data.estado == "anulado" &&
+            request.resource.data.motivoAnulacion is string &&
+            request.resource.data.motivoAnulacion.size() >= 5 &&
+            request.resource.data.motivoAnulacion.size() <= 300 &&
+            request.resource.data.diff(resource.data)
+              .affectedKeys().hasOnly([
+                "estado", "motivoAnulacion",
+                "actualizadoPor", "actualizadoEn"
+              ])
+          )
+        );
+
+      allow delete: if false;
+    }
+match /{document=**} {
       allow read, write: if false;
     }
   }
 }
+
