@@ -21,6 +21,104 @@ service cloud.firestore {
         exists(/databases/$(database)/documents/prestamos/$(id)) &&
         get(/databases/$(database)/documents/prestamos/$(id)).data.empleadoId == request.auth.uid;
     }
+    function fondoRuta() {
+      return /databases/$(database)/documents/configuracionFondo/principal;
+    }
+
+    function prestamoRuta(id) {
+      return /databases/$(database)/documents/prestamos/$(id);
+    }
+
+    function pagoRuta(id) {
+      return /databases/$(database)/documents/pagos/$(id);
+    }
+
+    function saldoRuta(id) {
+      return /databases/$(database)/documents/saldosPrestamo/$(id);
+    }
+
+    function reciboAbonoRuta(id) {
+      return /databases/$(database)/documents/recibosAbono/$(id);
+    }
+
+    function reciboPrestamoRuta(id) {
+      return /databases/$(database)/documents/recibosPrestamo/$(id);
+    }
+
+    function disponibleAnterior() {
+      return resource.data.get(
+        "saldoDisponibleCentavos",
+        resource.data.saldoInicialCentavos
+      );
+    }
+
+    function capitalRecuperado(capital, total, abonado) {
+      return int((abonado * capital) / total + 0.5);
+    }
+
+    function prestamoNuevoValido(id) {
+      let p = getAfter(prestamoRuta(id)).data;
+      let r = getAfter(reciboPrestamoRuta(id)).data;
+      return !exists(prestamoRuta(id)) &&
+        !exists(reciboPrestamoRuta(id)) &&
+        p.creadoPor == request.auth.uid &&
+        p.creadoEn == request.time &&
+        p.entregaConfirmada == true &&
+        p.tipoCalculo == "total_pactado_manual" &&
+        p.capitalCentavos is int &&
+        p.capitalCentavos > 0 &&
+        p.totalPactadoCentavos is int &&
+        p.totalPactadoCentavos >= p.capitalCentavos &&
+        r.prestamoId == id &&
+        r.tipo == "entrega_prestamo" &&
+        r.capitalCentavos == p.capitalCentavos &&
+        r.creadoPor == request.auth.uid &&
+        r.creadoEn == request.time;
+    }
+
+    function pagoNuevoValido(id) {
+      let p = getAfter(pagoRuta(id)).data;
+      let l = get(prestamoRuta(p.prestamoId)).data;
+      let s = getAfter(saldoRuta(p.prestamoId)).data;
+      let anterior = exists(saldoRuta(p.prestamoId))
+        ? get(saldoRuta(p.prestamoId)).data.abonadoCentavos
+        : 0;
+      let r = getAfter(reciboAbonoRuta(id)).data;
+      return !exists(pagoRuta(id)) &&
+        !exists(reciboAbonoRuta(id)) &&
+        p.creadoPor == request.auth.uid &&
+        p.creadoEn == request.time &&
+        p.montoCentavos is int &&
+        p.montoCentavos > 0 &&
+        l.capitalCentavos is int &&
+        l.totalPactadoCentavos is int &&
+        l.totalPactadoCentavos >= l.capitalCentavos &&
+        s.prestamoId == p.prestamoId &&
+        s.ultimoPagoId == id &&
+        s.abonadoCentavos == anterior + p.montoCentavos &&
+        s.abonadoCentavos <= l.totalPactadoCentavos &&
+        p.saldoPosteriorCentavos ==
+          l.totalPactadoCentavos - s.abonadoCentavos &&
+        r.prestamoId == p.prestamoId &&
+        r.tipo == "abono" &&
+        r.montoCentavos == p.montoCentavos &&
+        r.creadoPor == request.auth.uid;
+    }
+
+    function incrementoCapitalPago(id) {
+      let p = getAfter(pagoRuta(id)).data;
+      let l = get(prestamoRuta(p.prestamoId)).data;
+      let s = getAfter(saldoRuta(p.prestamoId)).data;
+      return capitalRecuperado(
+        l.capitalCentavos,
+        l.totalPactadoCentavos,
+        s.abonadoCentavos
+      ) - capitalRecuperado(
+        l.capitalCentavos,
+        l.totalPactadoCentavos,
+        s.abonadoCentavos - p.montoCentavos
+      );
+    }
     match /usuarios/{id} {
       allow get: if admin() || (request.auth != null && request.auth.uid == id);
       allow list: if admin();
@@ -36,8 +134,34 @@ service cloud.firestore {
       allow delete: if false;
     }
     match /prestamos/{id} {
-      allow read: if admin() || (empleado() && resource.data.empleadoId == request.auth.uid);
-      allow create, update: if admin();
+      allow read: if admin() ||
+        (empleado() && resource.data.empleadoId == request.auth.uid);
+
+      allow create: if admin() &&
+        request.resource.data.creadoPor == request.auth.uid &&
+        request.resource.data.creadoEn == request.time &&
+        request.resource.data.capitalCentavos is int &&
+        request.resource.data.capitalCentavos > 0 &&
+        request.resource.data.totalPactadoCentavos is int &&
+        request.resource.data.totalPactadoCentavos >=
+          request.resource.data.capitalCentavos &&
+        getAfter(fondoRuta()).data.ultimoPrestamoId == id &&
+        getAfter(fondoRuta()).data.saldoDisponibleCentavos ==
+          get(fondoRuta()).data.get(
+            "saldoDisponibleCentavos",
+            get(fondoRuta()).data.saldoInicialCentavos
+          ) - request.resource.data.capitalCentavos;
+
+      allow update: if admin() &&
+        request.resource.data.capitalCentavos ==
+          resource.data.capitalCentavos &&
+        request.resource.data.totalPactadoCentavos ==
+          resource.data.totalPactadoCentavos &&
+        request.resource.data.creadoPor ==
+          resource.data.creadoPor &&
+        request.resource.data.creadoEn ==
+          resource.data.creadoEn;
+
       allow delete: if false;
     }
     match /recibosPrestamo/{id} {
@@ -57,37 +181,59 @@ service cloud.firestore {
     match /saldosPrestamo/{id} {
       allow get: if admin() || asignado(id);
       allow list: if admin();
-      allow create, update: if admin() || (
-        asignado(id) &&
+
+      allow create, update: if
+        (admin() || asignado(id)) &&
         request.resource.data.prestamoId == id &&
+        request.resource.data.ultimoPagoId is string &&
         request.resource.data.abonadoCentavos is int &&
         request.resource.data.abonadoCentavos > 0 &&
-        request.resource.data.abonadoCentavos <=
-          get(/databases/$(database)/documents/prestamos/$(id)).data.totalPactadoCentavos &&
         request.resource.data.totalCentavos ==
-          get(/databases/$(database)/documents/prestamos/$(id)).data.totalPactadoCentavos &&
-        (!exists(/databases/$(database)/documents/saldosPrestamo/$(id)) ||
-          request.resource.data.abonadoCentavos > resource.data.abonadoCentavos)
-      );
+          get(prestamoRuta(id)).data.totalPactadoCentavos &&
+        request.resource.data.abonadoCentavos <=
+          request.resource.data.totalCentavos &&
+        getAfter(pagoRuta(request.resource.data.ultimoPagoId))
+          .data.prestamoId == id &&
+        getAfter(pagoRuta(request.resource.data.ultimoPagoId))
+          .data.creadoPor == request.auth.uid &&
+        getAfter(fondoRuta()).data.ultimoPagoFondoId ==
+          request.resource.data.ultimoPagoId;
+
       allow delete: if false;
     }
     match /pagos/{id} {
-      allow read: if admin() || (empleado() && resource.data.creadoPor == request.auth.uid);
-      allow create: if admin() || (
-        asignado(request.resource.data.prestamoId) &&
+      allow read: if admin() ||
+        (empleado() && resource.data.creadoPor == request.auth.uid);
+
+      allow create: if
+        (admin() || (
+          empleado() &&
+          asignado(request.resource.data.prestamoId)
+        )) &&
         request.resource.data.creadoPor == request.auth.uid &&
+        request.resource.data.creadoEn == request.time &&
         request.resource.data.montoCentavos is int &&
-        request.resource.data.montoCentavos > 0
-      );
+        request.resource.data.montoCentavos > 0 &&
+        getAfter(saldoRuta(request.resource.data.prestamoId))
+          .data.ultimoPagoId == id &&
+        getAfter(fondoRuta()).data.ultimoPagoFondoId == id;
+
       allow update, delete: if false;
     }
     match /recibosAbono/{id} {
-      allow read: if admin() || (empleado() && resource.data.creadoPor == request.auth.uid);
-      allow create: if admin() || (
-        asignado(request.resource.data.prestamoId) &&
+      allow read: if admin() ||
+        (empleado() && resource.data.creadoPor == request.auth.uid);
+
+      allow create: if
+        (admin() || asignado(request.resource.data.prestamoId)) &&
         request.resource.data.creadoPor == request.auth.uid &&
-        request.resource.data.tipo == "abono"
-      );
+        request.resource.data.tipo == "abono" &&
+        request.resource.data.prestamoId ==
+          getAfter(pagoRuta(id)).data.prestamoId &&
+        request.resource.data.montoCentavos ==
+          getAfter(pagoRuta(id)).data.montoCentavos &&
+        getAfter(fondoRuta()).data.ultimoPagoFondoId == id;
+
       allow update, delete: if false;
     }
         match /gastos/{id} {
@@ -210,8 +356,9 @@ service cloud.firestore {
       allow delete: if false;
     }
     match /configuracionFondo/{id} {
-      allow get: if id == "principal" && admin();
+      allow get: if id == "principal" && (admin() || empleado());
       allow list: if false;
+
       allow create: if id == "principal" && admin() &&
         request.resource.data.keys().hasOnly([
           "saldoInicialCentavos", "abiertoEn", "creadoPor"
@@ -224,13 +371,62 @@ service cloud.firestore {
         request.resource.data.saldoInicialCentavos <= 1000000000000 &&
         request.resource.data.abiertoEn == request.time &&
         request.resource.data.creadoPor == request.auth.uid;
-      allow update, delete: if false;
+
+      allow update: if id == "principal" &&
+        request.resource.data.saldoDisponibleCentavos is int &&
+        request.resource.data.saldoDisponibleCentavos >= 0 &&
+        request.resource.data.saldoDisponibleCentavos <= 1000000000000 &&
+        (
+          (
+            admin() &&
+            request.resource.data.diff(resource.data)
+              .affectedKeys().hasOnly([
+                "saldoDisponibleCentavos", "ultimoPrestamoId"
+              ]) &&
+            request.resource.data.ultimoPrestamoId is string &&
+            prestamoNuevoValido(
+              request.resource.data.ultimoPrestamoId
+            ) &&
+            request.resource.data.saldoDisponibleCentavos ==
+              disponibleAnterior() -
+              getAfter(
+                prestamoRuta(request.resource.data.ultimoPrestamoId)
+              ).data.capitalCentavos
+          ) ||
+          (
+            (admin() || empleado()) &&
+            request.resource.data.diff(resource.data)
+              .affectedKeys().hasOnly([
+                "saldoDisponibleCentavos", "ultimoPagoFondoId"
+              ]) &&
+            request.resource.data.ultimoPagoFondoId is string &&
+            pagoNuevoValido(
+              request.resource.data.ultimoPagoFondoId
+            ) &&
+            (
+              admin() ||
+              asignado(
+                getAfter(
+                  pagoRuta(request.resource.data.ultimoPagoFondoId)
+                ).data.prestamoId
+              )
+            ) &&
+            request.resource.data.saldoDisponibleCentavos ==
+              disponibleAnterior() +
+              incrementoCapitalPago(
+                request.resource.data.ultimoPagoFondoId
+              )
+          )
+        );
+
+      allow delete: if false;
     }
     match /{document=**} {
       allow read, write: if false;
     }
   }
 }
+
 
 
 
