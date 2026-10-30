@@ -20,3 +20,5 @@ respaldo-*/
 firestore.rules.danado.*
 pruebas-seguridad/
 firestore.rules.propuesta
+
+firestore.rules.fondo-pruebas
