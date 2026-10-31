@@ -1,4 +1,4 @@
-﻿
+
 import { auth, db } from "./firebase.js";
 import {
   onAuthStateChanged,
@@ -10,6 +10,7 @@ import {
   getDoc,
   onSnapshot,
   writeBatch,
+  runTransaction,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
@@ -418,6 +419,7 @@ async function registerLoan(event) {
   try {
     const loanRef = doc(collection(db, "prestamos"));
     const receiptRef = doc(db, "recibosPrestamo", loanRef.id);
+    const fondoRef = doc(db, "configuracionFondo", "principal");
 
     const folio = `PLB-${loanRef.id.slice(0, 10).toUpperCase()}`;
 
@@ -466,12 +468,48 @@ async function registerLoan(event) {
       tipo: "entrega_prestamo"
     };
 
-    const batch = writeBatch(db);
+    await runTransaction(db, async transaction => {
+      const fondoSnapshot = await transaction.get(fondoRef);
 
-    batch.set(loanRef, loan);
-    batch.set(receiptRef, receipt);
+      if (!fondoSnapshot.exists()) {
+        throw new Error(
+          "No se ha configurado el fondo inicial de préstamos."
+        );
+      }
 
-    await batch.commit();
+      const fondo = fondoSnapshot.data();
+
+      const disponible = fondo.saldoDisponibleCentavos ??
+        fondo.saldoInicialCentavos;
+
+      if (
+        !Number.isSafeInteger(disponible) ||
+        disponible < 0
+      ) {
+        throw new Error(
+          "El saldo del fondo es inválido. Requiere revisión."
+        );
+      }
+
+      if (schedule.capitalCentavos > disponible) {
+        throw new Error(
+          "FONDO_INSUFICIENTE: Disponible " +
+          money(disponible) +
+          ", capital solicitado " +
+          money(schedule.capitalCentavos) +
+          "."
+        );
+      }
+
+      transaction.set(loanRef, loan);
+      transaction.set(receiptRef, receipt);
+
+      transaction.update(fondoRef, {
+        saldoDisponibleCentavos:
+          disponible - schedule.capitalCentavos,
+        ultimoPrestamoId: loanRef.id
+      });
+    });
 
     committed = true;
     receiptId = receiptRef.id;
@@ -1013,5 +1051,3 @@ onAuthStateChanged(auth, async user => {
     toast(error.message);
   }
 });
-
-

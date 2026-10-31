@@ -1,4 +1,4 @@
-﻿
+
 import { auth, db } from "./firebase.js";
 import {
   onAuthStateChanged
@@ -237,6 +237,7 @@ async function savePayment(event) {
   const clientRef = doc(db, "clientes", selectedLoan.clienteId);
   const balanceRef = doc(db, "saldosPrestamo", loanId);
   const controlRef = doc(db, "prestamoControl", loanId);
+  const fondoRef = doc(db, "configuracionFondo", "principal");
 
   const paymentRef = doc(collection(db, "pagos"));
   const receiptRef = doc(db, "recibosAbono", paymentRef.id);
@@ -249,6 +250,7 @@ async function savePayment(event) {
       const controlSnapshot = await transaction.get(controlRef);
       const clientSnapshot = await transaction.get(clientRef);
       const balanceSnapshot = await transaction.get(balanceRef);
+      const fondoSnapshot = await transaction.get(fondoRef);
 
       if (!loanSnapshot.exists() || !clientSnapshot.exists()) {
         throw new Error("No se encontró el préstamo o cliente.");
@@ -307,6 +309,38 @@ async function savePayment(event) {
       const nextReceived = previous + amount;
       const nextBalance = total - nextReceived;
 
+      if (!fondoSnapshot.exists()) {
+        throw new Error("No existe el Fondo de Préstamos.");
+      }
+
+      const fondo = fondoSnapshot.data();
+      const disponible = fondo.saldoDisponibleCentavos ??
+        fondo.saldoInicialCentavos;
+
+      const desgloseFondo = repartoMovimiento(
+        loan.capitalCentavos,
+        total,
+        amount,
+        nextBalance
+      );
+
+      if (!desgloseFondo ||
+          !Number.isSafeInteger(disponible) ||
+          disponible < 0 ||
+          !Number.isSafeInteger(desgloseFondo.aCapitalCentavos) ||
+          desgloseFondo.aCapitalCentavos < 0) {
+        throw new Error(
+          "FONDO_RECUPERACION_CAPITAL: No se pudo validar la recuperacion."
+        );
+      }
+
+      const disponibleActualizado =
+        disponible + desgloseFondo.aCapitalCentavos;
+
+      if (!Number.isSafeInteger(disponibleActualizado)) {
+        throw new Error("El fondo excede el limite numerico permitido.");
+      }
+
       const payment = {
         prestamoId: loanId,
         folioPrestamo: loan.folio,
@@ -335,6 +369,11 @@ async function savePayment(event) {
       transaction.set(receiptRef, {
         ...payment,
         tipo: "abono"
+      });
+
+      transaction.update(fondoRef, {
+        saldoDisponibleCentavos: disponibleActualizado,
+        ultimoPagoFondoId: paymentRef.id
       });
     });
 
@@ -787,6 +826,3 @@ onAuthStateChanged(auth, async account => {
     console.error("Error de autorización de cobranza:", error);
   }
 });
-
-
-

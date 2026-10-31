@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -58,6 +58,8 @@
 <img src="imagenes/logo.png" alt="Logo">
 </div>
 <div class="stats">
+  <div class="stat"><span>Fondo disponible para prestar</span><strong id="fondoDisponible">—</strong><small id="fondoEstado">Pendiente de apertura</small></div>
+<div class="stat"><span>Capital colocado desde la apertura</span><strong id="fondoColocado">—</strong><small id="fondoColocadoNota">Sin fondo configurado</small></div>
   <div class="stat"><span>Capital entregado</span><strong id="contCapital">—</strong><small>Inversión entregada en préstamos</small></div>
   <div class="stat"><span>Capital recuperado</span><strong id="contRecuperado">—</strong><small>Parte de los abonos que recupera capital</small></div>
   <div class="stat"><span>Intereses cobrados</span><strong id="contIntereses">—</strong><small>Parte proporcional efectivamente abonada</small></div>
@@ -66,6 +68,11 @@
   <div class="stat"><span>Capital pendiente</span><strong id="contCapitalPendiente">—</strong><small>Capital por recuperar</small></div>
   <div class="stat"><span>Intereses pendientes</span><strong id="contInteresesPendientes">—</strong><small>Rendimiento pactado todavía por recibir</small></div>
   <div class="stat"><span>Saldo total pendiente</span><strong id="contSaldo">—</strong><small>Capital e intereses pendientes</small></div>
+</div>
+<div style="margin:0 0 22px">
+  <a href="fondo.html" style="display:inline-block;padding:13px 18px;background:#c9a35a;color:#061d3d;text-decoration:none;border-radius:9px;font-weight:800">
+    Configurar / consultar fondo de préstamos
+  </a>
 </div>
 <p id="contNota" style="font-size:12px;color:#72839a;margin-bottom:20px"></p>
 <div class="section-card">
@@ -226,11 +233,6 @@
 <script type="module" src="js/contabilidad-proporcional.js"></script>
 <script type="module" src="js/resumen-financiero.js"></script>
 <script src="./js/pwa.js" defer></script>
+<script type="module" src="js/fondo-resumen.js"></script>
 </body>
 </html>
-
-
-
-
-
-

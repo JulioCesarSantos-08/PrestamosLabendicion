@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#061d3d">
+<title>Fondo de Préstamos | La Bendición</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f6fb;color:#061d3d;font-family:Arial,sans-serif}
+header{background:#061d3d;color:#fff;padding:20px}
+header a{color:#dfb76b;text-decoration:none;font-weight:700}
+main{max-width:750px;margin:30px auto;padding:0 16px}
+h1{font-family:Georgia,serif;font-size:29px}
+.card{background:#fff;border:1px solid #e1e8f1;border-radius:14px;padding:24px;margin-bottom:18px}
+.eyebrow{color:#a8803a;font-size:11px;font-weight:800;letter-spacing:1px}
+label{display:block;font-size:13px;font-weight:700;margin-bottom:8px}
+input{width:100%;padding:15px;border:1px solid #d8e0eb;border-radius:9px;font-size:19px}
+button{border:0;background:#061d3d;color:white;border-radius:9px;padding:15px 22px;font-weight:800;cursor:pointer;margin-top:18px}
+button:disabled{opacity:.55;cursor:not-allowed}
+.muted{font-size:13px;line-height:1.8;color:#728298}
+.valor{font-size:30px;font-weight:800;color:#146b4b}
+.error{font-size:13px;color:#b42318;line-height:1.6}
+.exito{font-size:13px;color:#146b4b}
+[hidden]{display:none!important}
+@media(max-width:550px){.card{padding:16px}h1{font-size:24px}}
+</style>
+</head>
+<body>
+<header><a href="admin.html">← Volver al administrador</a></header>
+<main>
+<span class="eyebrow">PRÉSTAMOS LA BENDICIÓN</span>
+<h1>Fondo de Préstamos</h1>
+<p class="muted">Administra el capital destinado a entregar préstamos, separado de los intereses y gastos.</p>
+
+<div id="cargando" class="card">Verificando acceso y fondo actual...</div>
+
+<section id="sinFondo" class="card" hidden>
+<span class="eyebrow">APERTURA INICIAL</span>
+<h2>Configurar fondo inicial</h2>
+<p class="muted">Ingresa el dinero disponible para prestar al momento de la apertura. Esta cantidad solo podrá establecerse una vez.</p>
+<form id="formFondo">
+<label for="cantidad">Capital inicial en pesos mexicanos *</label>
+<input id="cantidad" placeholder="Ej. 50000.00" inputmode="decimal" required autocomplete="off">
+<button id="abrirFondo" type="submit">Confirmar apertura del fondo</button>
+</form>
+<p id="errorFondo" class="error" role="alert"></p>
+</section>
+
+<section id="conFondo" class="card" hidden>
+<span class="eyebrow">FONDO CONFIGURADO</span>
+<h2>Apertura registrada</h2>
+<div id="capitalInicial" class="valor">$0.00</div>
+<p id="fechaApertura" class="muted"></p>
+<p class="muted">La apertura no puede editarse desde este formulario. Los aportes, retiros y bloqueos automáticos de préstamos se implementarán como movimientos separados y auditables.</p>
+</section>
+
+<p id="estado" class="error" role="status"></p>
+</main>
+<script type="module" src="js/fondo.js"></script>
+<script src="js/pwa.js" defer></script>
+</body>
+</html>
