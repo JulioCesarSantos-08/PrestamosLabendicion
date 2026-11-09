@@ -1,4 +1,4 @@
-
+﻿
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -356,6 +356,53 @@ service cloud.firestore {
       allow delete: if false;
     }
     match /configuracionFondo/{id} {
+      function movimientoAjusteValido() {
+        let ruta = /databases/$(database)/documents/movimientosFondo/$(request.resource.data.ultimoAjusteFondoId);
+        let movimiento = getAfter(ruta).data;
+        let anterior = resource.data.get(
+          "saldoDisponibleCentavos",
+          resource.data.saldoInicialCentavos
+        );
+        let ajustes = resource.data.get("ajustesCapitalCentavos", 0);
+        let cambio = movimiento.tipo == "aporte"
+          ? movimiento.montoCentavos
+          : -movimiento.montoCentavos;
+
+        return !exists(ruta)
+          && movimiento.creadoPor == request.auth.uid
+          && movimiento.creadoEn == request.time
+          && movimiento.tipo in ["aporte", "retiro"]
+          && movimiento.montoCentavos is int
+          && movimiento.montoCentavos > 0
+          && movimiento.saldoAnteriorCentavos == anterior
+          && movimiento.saldoNuevoCentavos == anterior + cambio
+          && movimiento.capitalAnteriorCentavos ==
+            resource.data.saldoInicialCentavos + ajustes
+          && movimiento.capitalNuevoCentavos ==
+            resource.data.saldoInicialCentavos + ajustes + cambio
+          && request.resource.data.saldoDisponibleCentavos ==
+            movimiento.saldoNuevoCentavos
+          && request.resource.data.ajustesCapitalCentavos ==
+            ajustes + cambio;
+      }
+
+      allow update: if id == "principal" && admin()
+        && request.resource.data.diff(resource.data)
+          .affectedKeys().hasOnly([
+            "saldoDisponibleCentavos",
+            "ajustesCapitalCentavos",
+            "ultimoAjusteFondoId"
+          ])
+        && request.resource.data.ultimoAjusteFondoId is string
+        && request.resource.data.saldoDisponibleCentavos is int
+        && request.resource.data.ajustesCapitalCentavos is int
+        && request.resource.data.saldoDisponibleCentavos >= 0
+        && request.resource.data.saldoDisponibleCentavos <= 1000000000000
+        && request.resource.data.saldoInicialCentavos +
+           request.resource.data.ajustesCapitalCentavos > 0
+        && request.resource.data.saldoInicialCentavos +
+           request.resource.data.ajustesCapitalCentavos <= 1000000000000
+        && movimientoAjusteValido();
       allow get: if id == "principal" && (admin() || empleado());
       allow list: if false;
 
@@ -421,8 +468,50 @@ service cloud.firestore {
 
       allow delete: if false;
     }
+        match /movimientosFondo/{id} {
+      allow get, list: if admin();
+
+      allow create: if admin()
+        && request.resource.data.keys().hasOnly([
+          "tipo", "montoCentavos",
+          "saldoAnteriorCentavos", "saldoNuevoCentavos",
+          "capitalAnteriorCentavos", "capitalNuevoCentavos",
+          "nota", "creadoPor", "creadoEn"
+        ])
+        && request.resource.data.keys().hasAll([
+          "tipo", "montoCentavos",
+          "saldoAnteriorCentavos", "saldoNuevoCentavos",
+          "capitalAnteriorCentavos", "capitalNuevoCentavos",
+          "nota", "creadoPor", "creadoEn"
+        ])
+        && request.resource.data.creadoPor == request.auth.uid
+        && request.resource.data.creadoEn == request.time
+        && request.resource.data.tipo in ["aporte", "retiro"]
+        && request.resource.data.montoCentavos is int
+        && request.resource.data.montoCentavos > 0
+        && request.resource.data.nota is string
+        && request.resource.data.nota.size() >= 5
+        && request.resource.data.nota.size() <= 150
+        && getAfter(
+          /databases/$(database)/documents/configuracionFondo/principal
+        ).data.ultimoAjusteFondoId == id
+        && getAfter(
+          /databases/$(database)/documents/configuracionFondo/principal
+        ).data.saldoDisponibleCentavos ==
+          request.resource.data.saldoNuevoCentavos
+        && getAfter(
+          /databases/$(database)/documents/configuracionFondo/principal
+        ).data.saldoInicialCentavos +
+        getAfter(
+          /databases/$(database)/documents/configuracionFondo/principal
+        ).data.ajustesCapitalCentavos ==
+          request.resource.data.capitalNuevoCentavos;
+
+      allow update, delete: if false;
+    }
     match /{document=**} {
       allow read, write: if false;
     }
   }
 }
+
