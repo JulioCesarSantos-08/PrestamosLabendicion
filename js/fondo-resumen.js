@@ -38,7 +38,7 @@ function mostrarFondo(datos) {
     return;
   }
 
-  const inicial = datos.saldoInicialCentavos;
+  const inicial = datos.saldoInicialCentavos + (datos.ajustesCapitalCentavos || 0);
 
   const disponible = datos.saldoDisponibleCentavos ??
     inicial;
@@ -128,3 +128,4 @@ onAuthStateChanged(auth, async usuario => {
     );
   }
 });
+

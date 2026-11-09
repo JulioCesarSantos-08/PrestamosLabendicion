@@ -57,9 +57,48 @@ button:disabled{opacity:.55;cursor:not-allowed}
 <p class="muted">La apertura no puede editarse desde este formulario. Los aportes, retiros y bloqueos automáticos de préstamos se implementarán como movimientos separados y auditables.</p>
 </section>
 
+<section id="ajustesFondo" class="card" hidden>
+<span class="eyebrow">ADMINISTRACIÓN DEL CAPITAL</span>
+<h2>Modificar capital del fondo</h2>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:15px;margin-bottom:20px">
+<div>
+<p class="muted">Capital operativo</p>
+<div class="valor" id="capitalOperativo">$0.00</div>
+</div>
+<div>
+<p class="muted">Disponible para prestar</p>
+<div class="valor" id="saldoOperativo">$0.00</div>
+</div>
+<div>
+<p class="muted">Capital prestado pendiente</p>
+<div class="valor" id="capitalPrestado">$0.00</div>
+</div>
+</div>
+<form id="formAjusteFondo">
+<label for="tipoAjusteFondo">Tipo de movimiento</label>
+<select id="tipoAjusteFondo" required style="width:100%;padding:14px;border:1px solid #d8e0eb;border-radius:9px;margin-bottom:15px">
+<option value="aporte">Agregar capital</option>
+<option value="retiro">Retirar capital</option>
+</select>
+<label for="montoAjusteFondo">Importe en pesos</label>
+<input id="montoAjusteFondo" inputmode="decimal" placeholder="Ej. 20000.00" required>
+<label for="notaAjusteFondo" style="margin-top:15px">Motivo del movimiento</label>
+<input id="notaAjusteFondo" maxlength="150" placeholder="Ej. Nueva aportación del propietario" required>
+<p class="muted" id="vistaAjusteFondo"></p>
+<button type="submit" id="guardarAjusteFondo">Registrar movimiento</button>
+</form>
+<p id="mensajeAjusteFondo" role="alert"></p>
+</section>
+<section id="historialFondo" class="card" hidden>
+<span class="eyebrow">AUDITORÍA</span>
+<h2>Historial de aportaciones y retiros</h2>
+<div id="listaMovimientosFondo" class="muted">Consultando movimientos...</div>
+</section>
 <p id="estado" class="error" role="status"></p>
 </main>
 <script type="module" src="js/fondo.js"></script>
+<script type="module" src="js/fondo-ajustes.js"></script>
 <script src="js/pwa.js" defer></script>
 </body>
 </html>
+
